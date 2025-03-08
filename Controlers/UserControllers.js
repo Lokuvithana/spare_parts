@@ -1,3 +1,4 @@
+//this is controllers
 const User = require("../Model/UserModel");
 
 const getAllUsers = async (req , res , next) => {
