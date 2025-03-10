@@ -33,7 +33,7 @@ const addUsers = async (req , res , next) => {
     }
     //not insert users
     if (!users){
-        return res.status(404).json({message:"unable to add users"});
+        return res.status(404).json({message:"unable to add employees"});
     }
     return res.status(200).json({ users });
 
@@ -56,7 +56,7 @@ const getById = async (req , res , next) => {
     }
     //not available
     if (!user){
-        return res.status(404).json({message:"User not found"});
+        return res.status(404).json({message:"Employee not found"});
     }
     return res.status(200).json({ user });
 
@@ -81,7 +81,7 @@ const updateUser = async (req , res , next) => {
     }
     //not available
     if (!users){
-        return res.status(404).json({message:"Unable to update user details"});
+        return res.status(404).json({message:"Unable to update employee details"});
     }
     return res.status(200).json({ users});
 
@@ -100,7 +100,7 @@ const deleteUser = async ( req , res , next) => {
     }
      //not available
      if (!user){
-        return res.status(404).json({message:"Unable to delete user details"});
+        return res.status(404).json({message:"Unable to delete employee details"});
     }
     return res.status(200).json({ user});
 
