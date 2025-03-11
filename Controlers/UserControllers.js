@@ -1,113 +1,101 @@
+import User from "../Model/UserModel.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
-const User = require("../Model/UserModel");
+export function createEmployee(req,res){
 
-const getAllUsers = async (req , res , next) => {
+    const data = req.body;
 
-    let Users;
+    data.password = bcrypt.hashSync(data.password,10);
 
-    try{
-        users = await User.find();
-    }catch (err) {
-        console.log(err);
+    const newUser = new User(data);
+
+    newUser.save().then(()=>{
+        res.json({
+            message : "Employee created successfuly"
+        })
+    }).catch((error)=> {
+        res.status(500).json({
+            error : "Employee Not created"
+        })
+    })
+}
+
+export function updateEmployee(req,res){
+
+    const data = req.body;
+    const newUser = new User(data);
+
+    newUser.save().then(()=>{
+        res.json({
+            message : "Employee updated successfuly"
+        })
+    }).catch((error)=> {
+        res.status(500).json({
+            error : "Employee Not updated"
+        })
+    })
+}
+
+export function loginEmployee(req,res){
+
+    const data = req.body;
+
+    User.findOne({
+        email : data.email
+    }).then((user)=>{
+        if(user==null){
+            res.status(404).json ({
+                error : "Employee not found"
+            })
+        }
+        else{
+            const isPasswordCorrect = bcrypt.compareSync(data.password,user.password);
+
+            if(isPasswordCorrect){
+                const token = jwt.sign({
+                    firstName : user.firstName,
+                    lastName : user.lastName,
+                    role : user.role,
+                    employeeType : user.employeeType,
+                    salary : user.salary,
+                    email : user.email
+                },"sparepartkey")
+
+                res.json({
+                    message : "Login Sucessfull" ,
+                    token : token,
+                })
+
+            }
+            else{
+                res.status(401).json({
+                    error : "Login Failed"
+                })
+            }
+
+        }
+    })
+}
+
+export function isAdmin(req){
+
+    let admin = false;
+
+    if(req.user ==! null && req.user.role == "admin"){
+        admin = true;
     }
-    //not found
-    if(!users){
-        return res.status(404).json({message:"User not found"});
+    return admin;
+
+}
+
+export function isEmployee(req){
+
+    let employee = false;
+
+    if(req.user !== null && req.user.role !== "admin" && req.user.role !== "User"){
+
+        employee = true;
     }
-    //Display all users
-    return res.status(200).json({ users });
-};
-
-//data insert
-const addUsers = async (req , res , next) => {
-
-    const {name,gmail,age,address} = req.body;
-
-    let users;
-
-    try { 
-        users = new User({name,gmail,age,address});
-        await users.save();
-    }catch (err) {
-        console.log(err);
-    }
-    //not insert users
-    if (!users){
-        return res.status(404).json({message:"unable to add employees"});
-    }
-    return res.status(200).json({ users });
-
-
-
-};
-
-//get by ID
-const getById = async (req , res , next) => {
-
-    const id = req.params.id;
-
-    let user;
-
-    try{
-        user = await User.findById(id);
-    }catch (err){
-        console.log(err);
-
-    }
-    //not available
-    if (!user){
-        return res.status(404).json({message:"Employee not found"});
-    }
-    return res.status(200).json({ user });
-
-
-
-};
-
-//update user details
-const updateUser = async (req , res , next) => {
-    const id = req.params.id;
-    const {name,gmail,age,address} = req.body;
-
-    let users;
-
-    try{
-        users = await User.findByIdAndUpdate(id,
-            { name: name,gmail:gmail,age:age,address:address});
-            users = await users.save();
-
-    }catch(err){
-        console.log(err);
-    }
-    //not available
-    if (!users){
-        return res.status(404).json({message:"Unable to update employee details"});
-    }
-    return res.status(200).json({ users});
-
-};
-
-//delete user details
-const deleteUser = async ( req , res , next) => {
-    const id = req.params.id;
-
-    let user;
-
-    try{
-        user = await User.findByIdAndDelete(id)
-    }catch(err){
-        console.log(err);
-    }
-     //not available
-     if (!user){
-        return res.status(404).json({message:"Unable to delete employee details"});
-    }
-    return res.status(200).json({ user});
-
-};
-
-exports.getAllUsers = getAllUsers;
-exports.addUsers = addUsers;
-exports.getById = getById;
-exports.updateUser = updateUser;
-exports.deleteUser = deleteUser;
+    return employee;
+}

@@ -1,27 +1,71 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
+
 const Schema = mongoose.Schema;
 
-const userSchema = new Schema( {
-    name:{
-        type:String, //dataType
-        required:true, //validate
+const userSchema = new Schema({
+
+    username: {
+        type: String,
+        required: true,
+        unique: true // Ensures no duplicate usernames
     },
-    gmail:{
-        type:String, //dataType
-        required:true, //validate
+    password: {
+        type: String,
+        required: true
     },
-    age:{
-        type:Number, //dataType
-        required:true, //validate
+    email: {
+        type: String,
+        required: true,
+        unique: true, // Ensures no duplicate emails
     },
-    address:{
-        type:String, //dataType
-        required:true, //validate
+
+    firstName: {
+        type: String,
+        required: true
+    },
+    lastName: {
+        type: String,
+        required: true
+    },
+    address: {
+        type: String,
+        required: true
+    },
+    age: {
+        type: Number,
+        required: true,
+        min: 18, // Ensures the employee is at least 18 years old
+        max: 65  // Sets an upper limit for age
+    },
+    
+    phone: {
+        type: String,
+        required: true
+    },
+    
+    role: {
+        type: String,
+        required: true,
+        default: "User"
+    },
+    employeeType: {
+        type: String,
+        required: true,
+        default : "Temporary"
+    },
+    salary: {
+        type: Number,
+        required: true,
+        min: 0 // Ensures salary is not negative
+    },
+    
+    status: {
+        type: String,
+        required: true,
+        default: "Available"
     }
 });
 
-module.exports = mongoose.model(
-    "UserModel", //file name
-    userSchema //function name
-)
+const User = mongoose.model("employees", userSchema);
 
+export default User;

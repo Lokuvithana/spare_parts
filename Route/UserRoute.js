@@ -1,15 +1,11 @@
-const express = require("express");
-const router = express.Router();
-//Insert Model
-const User = require("../Model/UserModel");
-//Insert user controller
-const UserController = require("../Controlers/UserControllers");
+import express from "express";
+import { createEmployee, loginEmployee } from "../Controlers/UserControllers.js";
+import { updateEmployee } from "../Controlers/UserControllers.js";
 
-router.get("/",UserController.getAllUsers);
-router.post("/",UserController.addUsers);
-router.get("/:id",UserController.getById);
-router.put("/:id",UserController.updateUser);
-router.delete("/:id",UserController.deleteUser);
+const userRoute = express.Router();
 
-//export
-module.exports = router;
+userRoute.post("/",createEmployee);
+userRoute.put("/",updateEmployee);
+userRoute.post("/login",loginEmployee);
+
+export default userRoute;

@@ -1,19 +1,26 @@
 //password= 267KnrH0FysJKJmS
+//"mongodb+srv://admin:267KnrH0FysJKJmS@cluster0.taukt.mongodb.net/"
 
-const express = require("express");
-const mongoose = require("mongoose");
-const router = require("./Route/UserRoute");
+import express from "express"
+import mongoose from "mongoose"
+import userRoute from "./Route/UserRoute.js"
+import bodyParser from "body-parser"
 
 const app = express();
+app.use(bodyParser.json());
 
-//Middleware
-app.use(express.json());
-app.use("/users",router);
+let mongoUrl = "mongodb+srv://admin:267KnrH0FysJKJmS@cluster0.taukt.mongodb.net/";
 
+mongoose.connect(mongoUrl);
 
-mongoose.connect("mongodb+srv://admin:267KnrH0FysJKJmS@cluster0.taukt.mongodb.net/")
-.then( ()=> console.log("Connected to MongoDB"))
-.then( () => {
-    app.listen(5000);
+const conn = mongoose.connection;
+
+conn.once("open",()=>{
+    console.log("Connection established")
 })
-.catch( (err)=> console.log((err)));
+
+app.use("/api/employees",userRoute);
+
+app.listen(5000,()=>{
+    console.log ("Server running on port 5000");
+})
