@@ -5,9 +5,29 @@ import express from "express"
 import mongoose from "mongoose"
 import userRoute from "./Route/UserRoute.js"
 import bodyParser from "body-parser"
+import jwt from "jsonwebtoken"
 
 const app = express();
+
 app.use(bodyParser.json());
+
+app.use((req,res,next)=>{
+
+    let token = req.header("Authorization");
+
+    if(token != null){
+
+        token = token.replace("Bearer ","")
+
+        jwt.verify(token,"sparepartkey",(error,decoded)=>{
+
+            if(!error){
+                req.user = decoded;
+            }
+        })
+    }
+    next();
+})
 
 let mongoUrl = "mongodb+srv://admin:267KnrH0FysJKJmS@cluster0.taukt.mongodb.net/";
 

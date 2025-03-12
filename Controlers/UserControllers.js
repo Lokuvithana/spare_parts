@@ -15,6 +15,7 @@ export function createEmployee(req,res){
             message : "Employee created successfuly"
         })
     }).catch((error)=> {
+        console.log(error)
         res.status(500).json({
             error : "Employee Not created"
         })
@@ -23,18 +24,58 @@ export function createEmployee(req,res){
 
 export function updateEmployee(req,res){
 
-    const data = req.body;
-    const newUser = new User(data);
+    if(isAdmin(req)){
 
-    newUser.save().then(()=>{
-        res.json({
-            message : "Employee updated successfuly"
+        const id = req.params.id;
+        const data = req.body;
+
+        User.updateOne({id : id}, data).then(()=>{
+            res.json({
+                message : "Employee Upadated Successfully"
+            })
+        }).catch(()=>{
+            res.status(500).json({
+                message : "Employee Update is Failed"
+            })
         })
-    }).catch((error)=> {
-        res.status(500).json({
-            error : "Employee Not updated"
+    }
+    else if(isEmployee(req)){
+
+        const id = req.params.id;
+        const email = req.user.email;
+        const data = req.body;
+
+        const foundUser = User.findOne({id:id})
+
+        if(foundUser == null){
+            res.json({
+                message : "Employee not found"
+            })
+            return;
+
+        }else{
+
+            if(User.email = email){
+
+                User.updateOne({id : id},{status : data.status}).then(()=>{
+                    res.json({
+                        message : " Your status is updated"
+                    })
+                }).catch(()=>{
+                    res.status(500).json({
+                        message : "Status update is failed"
+                    })
+                })
+                
+            }
+        }
+
+
+    }else{
+        res.status(403).json({
+            message : "You are not autherized to do it"
         })
-    })
+    }
 }
 
 export function loginEmployee(req,res){
@@ -65,6 +106,7 @@ export function loginEmployee(req,res){
                 res.json({
                     message : "Login Sucessfull" ,
                     token : token,
+                    user:user
                 })
 
             }
@@ -78,14 +120,39 @@ export function loginEmployee(req,res){
     })
 }
 
+export function deleteEmployee(req,res){
+
+    if(isAdmin(req)){
+
+        const id = req.params.id;
+
+        User.deleteOne({id:id}).then(()=>{
+            res.json({
+                message : "Employee deleted sucessfully"
+            })
+        }).catch(()=>{
+            res.status(500).json({
+                message : "Employee delete failed"
+            })
+        })
+        return;
+    }
+    else{
+        res.status(401).json({
+            message : "Your not auherzied to do it"
+        })
+        return;
+    }
+}
+
 export function isAdmin(req){
 
-    let admin = false;
+    let Admin = false;
 
-    if(req.user ==! null && req.user.role == "admin"){
-        admin = true;
+    if(req.user !== null && req.user.role == "Admin"){
+        Admin = true;
     }
-    return admin;
+    return Admin;
 
 }
 
@@ -93,7 +160,7 @@ export function isEmployee(req){
 
     let employee = false;
 
-    if(req.user !== null && req.user.role !== "admin" && req.user.role !== "User"){
+    if(req.user !== null && req.user.role !== "Admin" && req.user.role !== "User"){
 
         employee = true;
     }

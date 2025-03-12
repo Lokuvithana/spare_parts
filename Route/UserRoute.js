@@ -1,11 +1,13 @@
 import express from "express";
-import { createEmployee, loginEmployee } from "../Controlers/UserControllers.js";
-import { updateEmployee } from "../Controlers/UserControllers.js";
+import { createEmployee, deleteEmployee, loginEmployee ,updateEmployee} from "../Controlers/UserControllers.js";
+
 
 const userRoute = express.Router();
 
 userRoute.post("/",createEmployee);
-userRoute.put("/",updateEmployee);
+userRoute.put("/:id",updateEmployee);
 userRoute.post("/login",loginEmployee);
+userRoute.delete("/:id",deleteEmployee);
+
 
 export default userRoute;

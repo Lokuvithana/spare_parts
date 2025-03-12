@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
 
-    username: {
+    id: {
         type: String,
         required: true,
         unique: true // Ensures no duplicate usernames
