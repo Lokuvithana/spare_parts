@@ -11,23 +11,29 @@ const app = express();
 
 app.use(bodyParser.json());
 
-app.use((req,res,next)=>{
-
+app.use((req, res, next) => {
+    
     let token = req.header("Authorization");
 
-    if(token != null){
+    if (token) {
+        token = token.replace("Bearer ", "");
 
-        token = token.replace("Bearer ","")
-
-        jwt.verify(token,"sparepartkey",(error,decoded)=>{
-
-            if(!error){
-                req.user = decoded;
+        jwt.verify(token, "sparepartkey", (error, decoded) => {
+            if (error) {
+                return res.status(401).json({ error: "Invalid token" });
             }
-        })
+            req.user = decoded;
+            next(); 
+        });
+
+    } else {
+
+        res.status(401).json({ error: "Authorization token required" });
+        return;
     }
-    next();
-})
+    
+});
+
 
 let mongoUrl = "mongodb+srv://admin:267KnrH0FysJKJmS@cluster0.taukt.mongodb.net/";
 
